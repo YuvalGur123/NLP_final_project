@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from transformers import  BertTokenizer, BertForQuestionAnswering, \
+from transformers import BertTokenizer, BertForQuestionAnswering, \
     BartTokenizer, BartForConditionalGeneration
 import spacy
 import nltk
@@ -170,53 +170,53 @@ plt.show()
 # Spacy NER algorithm. this is a very heavy and long part of the code to run.
 # Should only be ran once to get an impression of the code, then comment this block for any additional runs of the code
 
-# #start to comment from here
-#
-# #Load the SpaCy model
-# nlp = spacy.load('en_core_web_sm')
-#
-# #Load your data
-# df = pd.read_csv('processed_scopus.csv')
-#
-#
-# #Function to extract named entities from text
-# def extract_entities(text):
-#     doc = nlp(text)
-#     return [(ent.text, ent.label_) for ent in doc.ents]
-#
-#
-# # Apply NER to abstracts
-# df['entities'] = df['Abstract'].apply(extract_entities)
-#
-# all_entities = [ent for sublist in df['entities'] for ent in sublist]
-#
-# # Count entities by type
-# entity_types = [ent[1] for ent in all_entities]
-# entity_counts = Counter(entity_types)
-#
-# output_file = 'output.txt'
-#
-# with open(output_file, 'w', encoding='utf-8') as f:
-#     for index, row in df.iterrows():
-#         f.write(f"Title: {row['Title']}\n")
-#         f.write(f"Entities: {row['entities']}\n")
-#         f.write("\n")
-#
-# print(f"Output saved to {output_file}")
-#
-# # Plot the results
-# plt.figure(figsize=(10, 6))
-# plt.bar(entity_counts.keys(), entity_counts.values(), color='skyblue')
-# plt.xlabel('Entity Type')
-# plt.ylabel('Count')
-# plt.title('Distribution of Named Entity Types')
-# plt.xticks(rotation=45)
-# plt.show()
-#
-# # Display the results
-# print(df[['Title', 'entities']].head())
-#
-# # stop the comment here
+#start to comment from here
+
+#Load the SpaCy model
+nlp = spacy.load('en_core_web_sm')
+
+#Load your data
+df = pd.read_csv('processed_scopus.csv')
+
+
+#Function to extract named entities from text
+def extract_entities(text):
+    doc = nlp(text)
+    return [(ent.text, ent.label_) for ent in doc.ents]
+
+
+# Apply NER to abstracts
+df['entities'] = df['Abstract'].apply(extract_entities)
+
+all_entities = [ent for sublist in df['entities'] for ent in sublist]
+
+# Count entities by type
+entity_types = [ent[1] for ent in all_entities]
+entity_counts = Counter(entity_types)
+
+output_file = 'output.txt'
+
+with open(output_file, 'w', encoding='utf-8') as f:
+    for index, row in df.iterrows():
+        f.write(f"Title: {row['Title']}\n")
+        f.write(f"Entities: {row['entities']}\n")
+        f.write("\n")
+
+print(f"Output saved to {output_file}")
+
+# Plot the results
+plt.figure(figsize=(10, 6))
+plt.bar(entity_counts.keys(), entity_counts.values(), color='skyblue')
+plt.xlabel('Entity Type')
+plt.ylabel('Count')
+plt.title('Distribution of Named Entity Types')
+plt.xticks(rotation=45)
+plt.show()
+
+# Display the results
+print(df[['Title', 'entities']].head())
+
+# stop the comment here
 
 
 df2 = pd.read_csv('scopus.csv')
@@ -506,6 +506,8 @@ model.to(device)
 # Ensure model is in evaluation mode
 model.eval()
 
+# This part takes a long time to run. it is run on 100 abstracts to get an impression of the output
+# this should only be ran once and then commented out, or you can refer to the "summarized_scopus_bart.csv" to avoid running it
 
 # Function to summarize a list of abstracts using BART
 def summarize_batch(abstracts):
@@ -551,8 +553,10 @@ print("Summarization complete. The summarized data is saved in 'summarized_scopu
 # Getting the most common topics using a GPT model
 # The model of choice was bert-large, gpt-2 was useless and any newer version of chat-gpt requires paid access
 
+# This part takes a long time to run. it is configured to infer the topics of only 100 abstracts.
+# Comment out this part after running it once, or refer to "output.txt" file to see results without running
 
-# Load pre-trained DistilBERT tokenizer and model
+
 model_name = 'bert-large-uncased-whole-word-masking-finetuned-squad'
 tokenizer = BertTokenizer.from_pretrained(model_name, cache_dir=cache_dir)
 model = BertForQuestionAnswering.from_pretrained(model_name, cache_dir=cache_dir)
@@ -571,7 +575,6 @@ def answer_question(question, context):
         return_tensors='pt'
     )
 
-    # Perform inference
     with torch.no_grad():
         outputs = model(**inputs)
 
